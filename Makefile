@@ -1,9 +1,8 @@
 SHELL := /bin/bash
 AWS := aws
 HUGO := hugo
-HTMLPROOF :=  htmlproofer
-
 PUBLIC_FOLDER := public
+HTMLPROOF :=  htmlproofer
 S3_BUCKET = s3://example.com/
 CLOUDFRONT_ID := ABCD12345678
 DOMAIN = example.com
