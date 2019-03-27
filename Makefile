@@ -33,7 +33,7 @@ build: clean
 	$(HUGO)
 
 build-production: clean
-	HUGO_ENV=production $(HUGO)
+	HUGO_ENV=production $(HUGO) --minify
 
 serve: clean
 	$(HUGO) serve
