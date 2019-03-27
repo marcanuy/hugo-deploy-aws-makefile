@@ -45,17 +45,18 @@ update-themes:
 	git submodule update --remote --merge
 # 	git submodule foreach git pull origin master
 
-deploy: build-production check
+deploy: check build-production
 	echo "Copying files to server..."
 
 	$(AWS) s3 sync public/ $(S3_BUCKET) --size-only --delete | tee -a $(DEPLOY_LOG)
 	# filter files to process
 
 	# in bash: sed -e "s|^.*to ${S3_BUCKET}||p" salida | sed -e 's/index.html//'
-	grep "upload\|delete" $(TEMPFILE) | sed -e "s|.*upload.*to $(S3_BUCKET)|/|" | sed -e "s|.*delete: $(S3_BUCKET)|/|" | sed -e 's/index.html//' | sed -e 's/\(.*\).html/\1/' | tr '\n' ' ' | xargs aws cloudfront create-invalidation --distribution-id $(CLOUDFRONT_ID) --paths
+	grep "upload\|delete" $(DEPLOY_LOG) | sed -e "s|.*upload.*to $(S3_BUCKET)|/|" | sed -e "s|.*delete: $(S3_BUCKET)|/|" | sed -e 's/index.html//' | sed -e 's/\(.*\).html/\1/' | tr '\n' ' ' | xargs aws cloudfront create-invalidation --distribution-id $(CLOUDFRONT_ID) --paths
 	curl --silent "http://www.google.com/ping?sitemap=$(SITEMAP_URL)"
 	curl --silent "http://www.bing.com/webmaster/ping.aspx?siteMap=$(SITEMAP_URL)"
 
+# recipe to manually invalidate all files if deploy recipe fails invalidation due to complex filenames
 aws-cloudfront-invalidate-all:
 	$(AWS) cloudfront create-invalidation --distribution-id $(CLOUDFRONT_ID) --paths "/*"
 
